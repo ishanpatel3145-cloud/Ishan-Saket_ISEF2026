@@ -1,0 +1,51 @@
+conservative_subs = {
+    "A": ["G", "V"],
+    "V": ["A", "I", "L"],
+    "I": ["V", "L", "M"],
+    "L": ["I", "V", "M"],
+    "M": ["I", "L"],
+    "F": ["Y", "W"],
+    "Y": ["F", "W"],
+    "W": ["F", "Y"],
+    "S": ["T"],
+    "T": ["S"],
+    "N": ["Q"],
+    "Q": ["N", "E"],
+    "E": ["D", "Q"],
+    "D": ["E"],
+    "K": ["R"],
+    "R": ["K"],
+    "H": ["K", "R"],
+    "P": ["A"],
+    "C": ["S"]
+}
+def generate_single_mutants(sequence):
+    mutants = []
+    seq = list(sequence)
+
+    for i, aa in enumerate(seq):
+        if aa in conservative_subs:
+            for sub in conservative_subs[aa]:
+                new_seq = seq.copy()
+                new_seq[i] = sub
+                mutants.append("".join(new_seq))
+
+    return mutants
+original = "YNTNHVPLSPKY"
+
+mutants = generate_single_mutants(original)
+
+print("Original:")
+print(original)
+print("\nGenerated variants:")
+
+for m in mutants:
+    print(m)
+    
+# Artificial intelligence (ChatGPT, OpenAI) was used to assist in generating initial Python code for in-silico peptide sequence mutagenesis. 
+# The AI was used only for code structure and syntax. 
+# All biological assumptions, substitution rules, parameter selection, and experimental design decisions were made by the student.
+# The generated code was reviewed, modified, and validated by the student prior to use.
+# Conservative substitutions based on physicochemical similarity,
+# approximating positive-scoring substitutions in the BLOSUM62 matrix
+# (Henikoff & Henikoff, 1992)
