@@ -1,4 +1,3 @@
-# BLOSUM62 matrix (subset sufficient for peptides; full standard matrix)
 BLOSUM62 = {
     'A': {'A': 4, 'R': -1, 'N': -2, 'D': -2, 'C': 0, 'Q': -1, 'E': -1, 'G': 0, 'H': -2, 'I': -1,
           'L': -1, 'K': -1, 'M': -1, 'F': -2, 'P': -1, 'S': 1, 'T': 0, 'W': -3, 'Y': -2, 'V': 0},
@@ -50,7 +49,7 @@ conservative_subs = {
     "K": ["R"], "R": ["K"], "H": ["K", "R"], "P": ["A"], "C": ["S"]
 }
 
-def generate_negative_blosum_mutants(sequence):
+def generate_tier2(sequence):
     mutants = []
     amino_acids = list(BLOSUM62.keys())
 
@@ -59,26 +58,36 @@ def generate_negative_blosum_mutants(sequence):
             if mut == wt:
                 continue
 
-            # Skip conservative substitutions
+            # Exclude conservative substitutions
             if wt in conservative_subs and mut in conservative_subs[wt]:
                 continue
 
             score = BLOSUM62[wt][mut]
-            if score < 0:
+
+            # Keep only mildly negative substitutions: -2 ≤ score < 0
+            if -2 <= score < 0:
                 new_seq = list(sequence)
                 new_seq[i] = mut
-                mutants.append(("".join(new_seq), i + 1, wt, mut, score))
+                mutants.append({
+                    "sequence": "".join(new_seq),
+                    "position": i + 1,
+                    "wildtype": wt,
+                    "mutation": mut,
+                    "blosum62": score
+                })
 
     return mutants
 
 
 original = "YNTNHVPLSPKY"
-results = generate_negative_blosum_mutants(original)
+results = generate_tier2(original)
 
 print(f"Original: {original}\n")
-print("\nGenerated variants:")
-for seq, pos, wt, mut, score in results:
-    print(f"{seq}")
+print("Sequence\tBLOSUM62")
+
+for r in results:
+    print(f"{r['sequence']}\t{r['blosum62']}")
+
     
 # Artificial intelligence (ChatGPT, OpenAI) was used to assist in generating initial Python code for in-silico peptide sequence mutagenesis. 
 # The AI was used only for code structure and syntax. 
